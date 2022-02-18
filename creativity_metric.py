@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-
+from sklearn.cluster import KMeans as kmeans
 from improved_precision_recall import compute_pairwise_distances
 
 
@@ -22,6 +22,12 @@ class CREATIVITY(object):
 		self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
 		self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
 
+		# for clustering
+		self.num_cluster = 0
+		self.modes = None
+		self.sample_mode_ids = None
+		self.mode2mode_distances = None
+		self.mode2fake_distances = None
 
 	def is_in_realball(k = 3, samples = None):
 		""" Compute the differences between radii of kNN real balls and distances
@@ -111,3 +117,35 @@ class CREATIVITY(object):
 		scores_ids = (-scores).argsort()[:samples.shape[0] - num_out_ball]
 
 		return scores, scores_ids
+
+
+	def clustering_kmeans(k = 3, num_cluster = 300, samples = None):
+		"""
+		"""
+		if self.num_cluster != num_cluster:
+			cluster = kmeans(n_clusters = num_cluster).fit(real_manifold.features)
+			self.modes = cluster.cluster_centers_
+			self.sample_mode_ids = cluster.labels_
+
+			self.mode2mode_distances = compute_pairwise_distances(modes)
+
+
+
+
+
+
+
+
+
+
+
+	def metric4(k = 3, num_cluster = 300, smaples = None):
+
+
+
+
+
+
+
+
+
