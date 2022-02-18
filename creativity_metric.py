@@ -137,7 +137,7 @@ class CREATIVITY(object):
 
 		samples = self.fake_features if samples is None else samples
 
-		self.clustering_kmeans(k = k, num_cluster = num_cluster, samples = samples)
+		self.clustering_kmeans(num_cluster = num_cluster, samples = samples)
 
 		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples = samples, k = k, cluster = True)
 		num_out_ball = len(out_ball_ids)
@@ -172,7 +172,7 @@ class CREATIVITY(object):
 
 		samples = self.fake_features if samples is None else samples
 
-		self.clustering_kmeans(k = k, num_cluster = num_cluster, samples = samples)
+		self.clustering_kmeans(num_cluster = num_cluster, samples = samples)
 
 		_, num_reals_in_mode = np.unique(self.sample_mode_ids, return_counts = True)
 		in_ball_dist_sample, _, out_ball_ids = self.is_in_ball(samples = samples, k = k, cluster = True)
@@ -192,7 +192,7 @@ class CREATIVITY(object):
 
 		return scores, scores_ids
 
-	def clustering_kmeans(self, samples, k = 3, num_cluster = 300, verbose = 1):
+	def clustering_kmeans(self, samples, num_cluster = 300, verbose = 1):
 		""" Implementing kmeans clustering with real features and 
 			preprocessing some varialbes.
 			
