@@ -34,8 +34,8 @@ class CREATIVITY(object):
 
 
 	def is_in_ball(self, k = 3, samples = None, cluster = False):
-		""" Compute the differences between radii of kNN real balls and distances
-			for judging whether they are in each kNN real ball or not.
+		""" Compute the differences between radii of kNN balls and distances
+			for judging whether they are in each kNN ball or not.
 
 			args:
 				k (int): real ball's size is distance between reference real sample 
@@ -43,8 +43,8 @@ class CREATIVITY(object):
 				samples (np.array, num_samples * embed_dim): embedded generation samples
 			return:
 				dist_radi (np.array, num_reals * num_samples): each element means 
-						 (radii of real - (distance between real and sample)).
-						 if it is larger than 0, it is out of the real ball.
+						 (radii of a ball - (distance between center of the ball and a sample)).
+						 if it is larger than 0, it is out of the ball.
 				r (np.array, num_reals * 1): radii of each kNN real balls
 				out_ball_ids (np.array, num_out_ball_samples): indices of samples outside of balls.
 		"""
@@ -72,7 +72,7 @@ class CREATIVITY(object):
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
 				scores (np.array, num_samples): scores of each samples that are not sorted.
-				scores_ids (np.array, num_in_ball_samples): for samples in valid reall balls,
+				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid real balls,
 					  sorted indices in decreasing order.
 		"""
 
@@ -102,7 +102,7 @@ class CREATIVITY(object):
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
 				scores (np.array, num_samples): scores of each samples that are not sorted.
-				scores_ids (np.array, num_in_ball_samples): for samples in valid reall balls,
+				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid real balls,
 					  sorted indices in decreasing order.
 		"""
 
@@ -126,13 +126,20 @@ class CREATIVITY(object):
 		return scores, scores_ids
 
 
-	def clustering_kmeans(self, k = 3, num_cluster = 300, samples = None):
-		"""
+	def clustering_kmeans(self, k = 3, num_cluster = 300, samples = None, verbose = 1):
+		""" Implementing kmeans clustering with real features and 
+			preprocessing some varialbes.
+			
+			args:
+				k (int): a mode ball's size is distance between the mode and the k th nearest mode.
+				num_cluster (int): the number of classes how many you want to divide.
+				samples (np.array, N * embed_dim): embedded generation samples
 		"""
 		samples = self.fake_features if samples is None else samples
 
 		if self.num_cluster != num_cluster:
-			cluster = kmeans(n_clusters = num_cluster).fit(real_manifold.features)
+			print("Now, clustering is in progress...")
+			cluster = kmeans(n_clusters = num_cluster, verbose = verbose).fit(self.real_features)
 			self.modes = cluster.cluster_centers_
 			self.sample_mode_ids = cluster.labels_
 
@@ -140,9 +147,23 @@ class CREATIVITY(object):
 			self.mode2fake_distances = compute_pairwise_distances(self.modes, samples)
 			self.mode2mode_sorted = np.sort(self.mode2mode_distances, axis = 1)
 			self.mode2mode_sorted_ids = self.mode2mode_distances.argsort(axis = 1)
-
+			print("Clustering is done!")
+		else:
+			print("Clustering is already processed")
 
 	def metric3(self, k = 15, num_cluster = 300, samples = None):
+		""" When there are multiple mode balls that contain a fake sample,
+			the more apart the real balls are, the more creative the fake smaple would be.
+
+			args:
+				k (int): a mode ball's size is distance between the mode and the k th nearest mode.
+				num_cluster (int): the number of classes how many you want to divide.
+				samples (np.array, N * embed_dim): embedded generation samples
+			return:
+				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid balls,
+					  sorted indices in decreasing order.
+		"""
 
 		samples = self.fake_features if samples is None else samples
 
@@ -166,6 +187,18 @@ class CREATIVITY(object):
 		return scores, scores_ids
 
 	def metric4(self, k = 15, num_cluster = 300, samples = None):
+		""" When there are multiple mode balls that contain a fake sample,
+			the less the real samples are in mode balls, the more creative the fake sample would be.
+
+			args:
+				k (int): a mode ball's size is distance between the mode and the k th nearest mode.
+				num_cluster (int): the number of classes how many you want to divide.
+				samples (np.array, N * embed_dim): embedded generation samples
+			return:
+				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid balls,
+					  sorted indices in decreasing order.
+		"""
 
 		samples = self.fake_features if samples is None else samples
 
@@ -174,7 +207,7 @@ class CREATIVITY(object):
 		in_ball_dist, _, __ = self.is_in_ball(k = k, samples = self.real_features, cluster = True)
 		num_reals_in_mode_ball = (in_ball_dist > 0).sum(axis = 1)
 
-		in_ball_dist_sample, _, out_ball_ids = self.is_in_ball(k = k, cluster = True)
+		in_ball_dist_sample, _, out_ball_ids = self.is_in_ball(samples = samples, k = k, cluster = True)
 		num_out_ball = len(out_ball_ids)
 
 		modes_ids, samples_ids = np.where(in_ball_dist_sample > 0)
@@ -182,7 +215,7 @@ class CREATIVITY(object):
 
 		scores = np.zeros(samples.shape[0])
 		for i in range(samples.shape[0]):
-			mode_ids = modes_ids[cnt[i] : cnt[i+1]]
+			mode_ids = modes_ids[:cnt[i]] if i == 0 else modes_ids[cnt[i-1]: cnt[i]]
 			scores[i] = (1. / num_reals_in_mode_ball[mode_ids]).sum()
 
 		scores_ids = (-scores).argsort()[:samples.shape[0] - num_out_ball]
