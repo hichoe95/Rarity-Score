@@ -33,7 +33,7 @@ class CREATIVITY(object):
 		self.mode2mode_sorted_ids = None
 
 
-	def is_in_ball(k = 3, samples = None, cluster = False):
+	def is_in_ball(self, k = 3, samples = None, cluster = False):
 		""" Compute the differences between radii of kNN real balls and distances
 			for judging whether they are in each kNN real ball or not.
 
@@ -51,12 +51,12 @@ class CREATIVITY(object):
 
 		if samples is None:
 			samples = self.fake_features
-			real2samples_distances = self.real2fake_distances if !cluster else self.mode2fake_distances
+			real2samples_distances = self.real2fake_distances if not cluster else self.mode2fake_distances
 		else:
-			real2samples_distances = compute_pairwise_distances(self.real_features, samples) if !cluster else \
+			real2samples_distances = compute_pairwise_distances(self.real_features, samples) if not cluster else \
 			compute_pairwise_distances(self.modes, samples)
 
-		r = self.real2real_sorted[:,k:k+1] if !cluster else self.mode2mode_sorted[:, k:k+1]
+		r = self.real2real_sorted[:,k:k+1] if not cluster else self.mode2mode_sorted[:, k:k+1]
 
 		dist_radi = (r.repeat(samples.shape[0], axis = 1) - real2samples_distances)
 		out_ball_ids = np.where((dist_radi > 0).any(axis = 0) == False)[0]
@@ -77,7 +77,7 @@ class CREATIVITY(object):
 		"""
 
 		samples = self.fake_features if samples is None else samples
-		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples, k = k)
+		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples = samples, k = k)
 
 		num_out_ball = len(out_ball_ids)
 		valid_real_balls = (in_ball_dist>0)
@@ -108,7 +108,7 @@ class CREATIVITY(object):
 
 		samples = self.fake_features if samples is None else samples
 
-		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples, k = k)
+		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples = samples, k = k)
 		num_out_ball = len(out_ball_ids)
 
 		valid_real_balls = (in_ball_dist > 0)
@@ -148,7 +148,7 @@ class CREATIVITY(object):
 
 		self.clustering_kmeans(k = k, num_cluster = num_cluster, samples = samples)
 
-		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples, k = k, cluster = True)
+		in_ball_dist, r, out_ball_ids = self.is_in_ball(samples = samples, k = k, cluster = True)
 		num_out_ball = len(out_ball_ids)
 
 		valid_mode_balls = (in_ball_dist>0)
