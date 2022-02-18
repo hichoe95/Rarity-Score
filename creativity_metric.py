@@ -9,7 +9,7 @@ from improved_precision_recall import compute_pairwise_distances
 class CREATIVITY(object):
 	def __init__(self, real_features, fake_features):
 
-		self.real_features = real_features
+		self.real_features = real_features 
 		self.fake_features = fake_features
 
 		self.num_reals = real_features.shape[0]
