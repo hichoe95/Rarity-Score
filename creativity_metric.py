@@ -65,7 +65,7 @@ class CREATIVITY(object):
 						 and k th nearest real sample.
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
-				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores (np.array, num_samples): scores of each samples which are not sorted.
 				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid real balls,
 					  sorted indices in decreasing order.
 		"""
@@ -95,7 +95,7 @@ class CREATIVITY(object):
 						 and k th nearest real sample.
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
-				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores (np.array, num_samples): scores of each samples which are not sorted.
 				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid real balls,
 					  sorted indices in decreasing order.
 		"""
@@ -130,7 +130,7 @@ class CREATIVITY(object):
 				num_cluster (int): the number of classes how many you want to divide.
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
-				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores (np.array, num_samples): scores of each samples which are not sorted.
 				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid balls,
 					  sorted indices in decreasing order.
 		"""
@@ -165,7 +165,7 @@ class CREATIVITY(object):
 				num_cluster (int): the number of classes how many you want to divide.
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
-				scores (np.array, num_samples): scores of each samples that are not sorted.
+				scores (np.array, num_samples): scores of each samples which are not sorted.
 				scores_ids (np.array, num_samples_in_valid_ball): for samples in valid balls,
 					  sorted indices in decreasing order.
 		"""
