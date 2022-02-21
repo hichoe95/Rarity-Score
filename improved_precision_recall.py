@@ -37,12 +37,16 @@ class IPR():
         self.batch_size = batch_size
         self.k = k
         self.num_samples = num_samples
+        self.model = model
+        print(self.model)
         if model is None:
             print('loading vgg16 for improved precision and recall...', end='', flush=True)
             self.vgg16 = models.vgg16(pretrained=True).cuda().eval()
             print('done')
         else:
             self.vgg16 = model
+
+        
 
     def __call__(self, subject):
         return self.precision_and_recall(subject)
@@ -144,9 +148,12 @@ class IPR():
             end = start + self.batch_size
             batch = images[start:end]
             batch = resize(batch)
-            before_fc = self.vgg16.features(batch.cuda())
-            before_fc = before_fc.view(-1, 7 * 7 * 512)
-            feature = self.vgg16.classifier[:4](before_fc)
+            if self.model is None:
+                before_fc = self.vgg16.features(batch.cuda())
+                before_fc = before_fc.view(-1, 7 * 7 * 512)
+                feature = self.vgg16.classifier[:4](before_fc)
+            else:
+                feature = self.vgg16(batch.cuda())
             features.append(feature.cpu().data.numpy())
 
         return np.concatenate(features, axis=0)
