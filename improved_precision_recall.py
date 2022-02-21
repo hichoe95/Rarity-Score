@@ -38,7 +38,7 @@ class IPR():
         self.k = k
         self.num_samples = num_samples
         self.model = model
-        print(self.model)
+
         if model is None:
             print('loading vgg16 for improved precision and recall...', end='', flush=True)
             self.vgg16 = models.vgg16(pretrained=True).cuda().eval()
@@ -175,9 +175,12 @@ class IPR():
 
         features = []
         for batch in tqdm(dataloader, desc=desc):
-            before_fc = self.vgg16.features(batch.cuda())
-            before_fc = before_fc.view(-1, 7 * 7 * 512)
-            feature = self.vgg16.classifier[:4](before_fc)
+            if self.model is None:
+                before_fc = self.vgg16.features(batch.cuda())
+                before_fc = before_fc.view(-1, 7 * 7 * 512)
+                feature = self.vgg16.classifier[:4](before_fc)
+            else:
+                feature = self.vgg16(batch.cuda()).view(self.batch_size, -1)
             features.append(feature.cpu().data.numpy())
 
         return np.concatenate(features, axis=0)
