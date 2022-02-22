@@ -127,7 +127,7 @@ class CREATIVITY(object):
 
 			args:
 				k (int): a mode ball's size is distance between the mode and the k th nearest mode.
-				num_cluster (int): the number of classes how many you want to divide.
+				num_cluster (int): the number of classes how many you want to divide. 
 				samples (np.array, N * embed_dim): embedded generation samples
 			return:
 				scores (np.array, num_samples): scores of each samples which are not sorted.
