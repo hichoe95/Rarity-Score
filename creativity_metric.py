@@ -7,7 +7,9 @@ from improved_precision_recall import compute_pairwise_distances
 
 
 class CREATIVITY(object):
-	def __init__(self, real_features, fake_features):
+	def __init__(self, real_features, fake_features, metric = 'euclidian'):
+
+		self.metric = metric
 
 		self.real_features = real_features 
 		self.fake_features = fake_features
@@ -16,7 +18,7 @@ class CREATIVITY(object):
 		self.num_fakes = fake_features.shape[0]
 
 		print('Preprocessing pairwise diatances ...')
-		self.real2real_distances = compute_pairwise_distances(real_features)
+		self.real2real_distances = compute_pairwise_distances(real_features, metric = self.metric)
 
 		self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
 		self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
@@ -46,9 +48,9 @@ class CREATIVITY(object):
 				out_ball_ids (np.array, num_out_ball_samples): indices of samples outside of balls.
 		"""
 		if not cluster:
-			real2samples_distances = compute_pairwise_distances(self.real_features, samples)
+			real2samples_distances = compute_pairwise_distances(self.real_features, samples, metric = self.metric)
 		else:
-			real2samples_distances = compute_pairwise_distances(self.modes, samples)
+			real2samples_distances = compute_pairwise_distances(self.modes, samples, metric = self.metric)
 
 		r = self.real2real_sorted[:,k+1] if not cluster else self.mode2mode_sorted[:, k+1]
 
@@ -192,7 +194,7 @@ class CREATIVITY(object):
 
 		return scores, scores_ids
 
-	def clustering_kmeans(self, samples, num_cluster = 300, verbose = 1):
+	def clustering_kmeans(self, samples, num_cluster = 300, verbose = 1, metric = 'euclidian'):
 		""" Implementing kmeans clustering with real features and 
 			preprocessing some varialbes.
 			
@@ -209,7 +211,7 @@ class CREATIVITY(object):
 			self.modes = cluster.cluster_centers_
 			self.sample_mode_ids = cluster.labels_
 
-			self.mode2mode_distances = compute_pairwise_distances(self.modes)
+			self.mode2mode_distances = compute_pairwise_distances(self.modes, metric = self.metric)
 			self.mode2mode_sorted = np.sort(self.mode2mode_distances, axis = 1)
 			self.mode2mode_sorted_ids = self.mode2mode_distances.argsort(axis = 1)
 			print("Clustering is done!")

@@ -192,7 +192,7 @@ class IPR():
                             radii=self.manifold_ref.radii)
 
 
-def compute_pairwise_distances(X, Y=None):
+def compute_pairwise_distances(X, Y=None, metric = 'euclidian'):
     '''
     args:
         X: np.array of shape N x dim
@@ -200,33 +200,47 @@ def compute_pairwise_distances(X, Y=None):
     returns:
         N x N symmetric np.array
     '''
-    num_X = X.shape[0]
-    if Y is None:
-        num_Y = num_X
-    else:
-        num_Y = Y.shape[0]
-    X = X.astype(np.float64)  # to prevent underflow
-    X_norm_square = np.sum(X**2, axis=1, keepdims=True)
-    if Y is None:
-        Y_norm_square = X_norm_square
-    else:
-        Y_norm_square = np.sum(Y**2, axis=1, keepdims=True)
-    X_square = np.repeat(X_norm_square, num_Y, axis=1)
-    Y_square = np.repeat(Y_norm_square.T, num_X, axis=0)
-    if Y is None:
-        Y = X
-    XY = np.dot(X, Y.T)
-    diff_square = X_square - 2*XY + Y_square
+    if metric == 'euclidian':
+        num_X = X.shape[0]
+        if Y is None:
+            num_Y = num_X
+        else:
+            num_Y = Y.shape[0]
+        X = X.astype(np.float64)  # to prevent underflow
+        X_norm_square = np.sum(X**2, axis=1, keepdims=True)
+        if Y is None:
+            Y_norm_square = X_norm_square
+        else:
+            Y_norm_square = np.sum(Y**2, axis=1, keepdims=True)
+        X_square = np.repeat(X_norm_square, num_Y, axis=1)
+        Y_square = np.repeat(Y_norm_square.T, num_X, axis=0)
+        if Y is None:
+            Y = X
+        XY = np.dot(X, Y.T)
+        diff_square = X_square - 2*XY + Y_square
 
-    # check negative distance
-    min_diff_square = diff_square.min()
-    if min_diff_square < 0:
-        idx = diff_square < 0
-        diff_square[idx] = 0
-        print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
-              min_diff_square)
+        # check negative distance
+        min_diff_square = diff_square.min()
+        if min_diff_square < 0:
+            idx = diff_square < 0
+            diff_square[idx] = 0
+            print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
+                  min_diff_square)
 
-    distances = np.sqrt(diff_square)
+        distances = np.sqrt(diff_square)
+
+    elif metric == 'cossim':
+        X = X.astype(np.float64)
+        X = (X.T / np.linalg.norm(X, axis = 1)).T
+
+        if Y is None:
+            Y = X.T
+        else:
+            Y = Y.T / np.linalg.norm(Y, axis = 1)
+
+        print(X.shape, Y.shape)
+        distances = -(1 + X@Y)
+
     return distances
 
 
