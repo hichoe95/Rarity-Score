@@ -151,7 +151,7 @@ class IPR():
             if self.model is None:
                 before_fc = self.vgg16.features(batch.cuda())
                 before_fc = before_fc.view(-1, 7 * 7 * 512)
-                feature = self.vgg16.classifier[:4](before_fc)
+                feature = self.vgg16.classifier[:5](before_fc)
             else:
                 feature = self.vgg16(batch.cuda())
             features.append(feature.cpu().data.numpy())
@@ -178,7 +178,7 @@ class IPR():
             if self.model is None:
                 before_fc = self.vgg16.features(batch.cuda())
                 before_fc = before_fc.view(-1, 7 * 7 * 512)
-                feature = self.vgg16.classifier[:4](before_fc)
+                feature = self.vgg16.classifier[:5](before_fc)
             else:
                 feature = self.vgg16(batch.cuda()).view(self.batch_size, -1)
             features.append(feature.cpu().data.numpy())
