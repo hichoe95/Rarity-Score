@@ -31,7 +31,7 @@ class CREATIVITY(object):
 		self.mode2mode_distances = None
 		self.mode2mode_sorted = None
 		self.mode2mode_sorted_ids = None
-		print('Initialization is DONE ! ')
+		print('Initialization is DONE !')
 
 	def is_in_ball(self, k = 3, samples = None, cluster = False):
 		""" Compute the differences between radii of kNN balls and distances
