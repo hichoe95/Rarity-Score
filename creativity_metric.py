@@ -17,7 +17,7 @@ class CREATIVITY(object):
 		self.num_reals = real_features.shape[0]
 		self.num_fakes = fake_features.shape[0]
 
-		print('Preprocessing pairwise diatances ...')
+		print('Pre-processing pairwise diatances ...')
 		self.real2real_distances = compute_pairwise_distances(real_features, metric = self.metric)
 
 		self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
@@ -31,6 +31,7 @@ class CREATIVITY(object):
 		self.mode2mode_distances = None
 		self.mode2mode_sorted = None
 		self.mode2mode_sorted_ids = None
+		print('Initialization is DONE ! ')
 
 	def is_in_ball(self, k = 3, samples = None, cluster = False):
 		""" Compute the differences between radii of kNN balls and distances
@@ -52,7 +53,7 @@ class CREATIVITY(object):
 		else:
 			real2samples_distances = compute_pairwise_distances(self.modes, samples, metric = self.metric)
 
-		r = self.real2real_sorted[:,k+1] if not cluster else self.mode2mode_sorted[:, k+1]
+		r = self.real2real_sorted[:,k] if not cluster else self.mode2mode_sorted[:, k]
 
 		dist_radi = (r[:,None].repeat(samples.shape[0], axis = 1) - real2samples_distances)
 		out_ball_ids = np.where((dist_radi > 0).any(axis = 0) == False)[0]
