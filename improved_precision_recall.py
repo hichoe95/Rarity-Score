@@ -192,7 +192,7 @@ class IPR():
                             radii=self.manifold_ref.radii)
 
 
-def compute_pairwise_distances(X, Y=None, metric = 'euclidian'):
+def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
     '''
     args:
         X: np.array of shape N x dim
@@ -200,20 +200,26 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian'):
     returns:
         N x N symmetric np.array
     '''
+
+    X = torch.tensor(X).to(device)
+
+    if Y is not None:
+        Y = torch.tensor(Y).to(device)
+
     if metric == 'euclidian':
         num_X = X.shape[0]
         if Y is None:
             num_Y = num_X
         else:
             num_Y = Y.shape[0]
-        X = X.astype(np.float64)  # to prevent underflow
-        X_norm_square = np.sum(X**2, axis=1, keepdims=True)
+        X = X.astype(torch.float64)  # to prevent underflow
+        X_norm_square = torch.sum(X**2, dim=1, keepdims=True)
         if Y is None:
             Y_norm_square = X_norm_square
         else:
-            Y_norm_square = np.sum(Y**2, axis=1, keepdims=True)
-        X_square = np.repeat(X_norm_square, num_Y, axis=1)
-        Y_square = np.repeat(Y_norm_square.T, num_X, axis=0)
+            Y_norm_square = torch.sum(Y**2, dim=1, keepdims=True)
+        X_square = np.repeat(X_norm_square, num_Y, dim=1)
+        Y_square = np.repeat(Y_norm_square.T, num_X, dim=0)
         if Y is None:
             Y = X
         XY = np.dot(X, Y.T)
@@ -261,7 +267,7 @@ def get_kth_value(np_array, k):
 
 
 def compute_metric(manifold_ref, feats_subject, desc=''):
-    num_subjects = feats_subject.shape[0]
+    num_subjects = feats_subject.s hape[0]
     count = 0
     dist = compute_pairwise_distances(manifold_ref.features, feats_subject)
     for i in trange(num_subjects, desc=desc):
