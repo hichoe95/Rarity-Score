@@ -192,6 +192,15 @@ class IPR():
                             radii=self.manifold_ref.radii)
 
 
+
+def cuda_empty(func):
+    def wrapper(*args, **kwargs):
+        func(*args, **kwargs)
+        torch.cuda.empty_cache()
+    return wrapper
+
+@torch.no_grad()
+@cuda_empty
 def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
     '''
     args:
@@ -200,7 +209,6 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
     returns:
         N x N symmetric np.array
     '''
-
     X = torch.tensor(X).to(device)
 
     if Y is not None:
@@ -212,17 +220,19 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
             num_Y = num_X
         else:
             num_Y = Y.shape[0]
-        X = X.astype(torch.float64)  # to prevent underflow
+        X = X.type(torch.float64)  # to prevent underflow
         X_norm_square = torch.sum(X**2, dim=1, keepdims=True)
         if Y is None:
             Y_norm_square = X_norm_square
         else:
             Y_norm_square = torch.sum(Y**2, dim=1, keepdims=True)
-        X_square = np.repeat(X_norm_square, num_Y, dim=1)
-        Y_square = np.repeat(Y_norm_square.T, num_X, dim=0)
+        # X_square = torch.repeat(X_norm_square, num_Y, dim=1)
+        X_square = X_norm_square.expand(-1,num_Y)
+        # Y_square = torch.repeat(Y_norm_square.T, num_X, dim=0)
+        Y_square = Y_norm_square.T.expand(num_X, -1)
         if Y is None:
             Y = X
-        XY = np.dot(X, Y.T)
+        XY = torch.matmul(X, Y.T)
         diff_square = X_square - 2*XY + Y_square
 
         # check negative distance
@@ -233,21 +243,24 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
             print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
                   min_diff_square)
 
-        distances = np.sqrt(diff_square)
+        distances = torch.sqrt(diff_square)
 
     elif metric == 'cossim':
-        X = X.astype(np.float64)
-        X = (X.T / np.linalg.norm(X, axis = 1)).T
+        X = X.type(torch.float64)
+        X = (X.T / torch.linalg.norm(X, dim = 1)).T
 
         if Y is None:
             Y = X.T
         else:
-            Y = Y.T / np.linalg.norm(Y, axis = 1)
+            Y = Y.T / torch.linalg.norm(Y, dim = 1)
 
-        print(X.shape, Y.shape)
         distances = -(1 + X@Y)
 
-    return distances
+        # X.detach().cpu(), Y.detach().cpu()
+        # del X, Y
+        # torch.cuda.empty_cache()
+
+    return distances.detach().cpu().numpy()
 
 
 def distances2radii(distances, k=3):
@@ -267,7 +280,7 @@ def get_kth_value(np_array, k):
 
 
 def compute_metric(manifold_ref, feats_subject, desc=''):
-    num_subjects = feats_subject.s hape[0]
+    num_subjects = feats_subject.shape[0]
     count = 0
     dist = compute_pairwise_distances(manifold_ref.features, feats_subject)
     for i in trange(num_subjects, desc=desc):
