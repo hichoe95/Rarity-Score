@@ -254,14 +254,9 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
         else:
             Y = Y.T / torch.linalg.norm(Y, dim = 1)
 
-        distances = -(1 + X@Y)
+        distances = (-(1 + X@Y)).detach().cpu().numpy()
 
-        # X.detach().cpu(), Y.detach().cpu()
-        # del X, Y
-        # torch.cuda.empty_cache()
-
-    return distances.detach().cpu().numpy()
-
+    return distances
 
 def distances2radii(distances, k=3):
     num_features = distances.shape[0]
