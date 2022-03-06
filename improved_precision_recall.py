@@ -195,8 +195,9 @@ class IPR():
 
 def cuda_empty(func):
     def wrapper(*args, **kwargs):
-        func(*args, **kwargs)
+        ret = func(*args, **kwargs)
         torch.cuda.empty_cache()
+        return ret
     return wrapper
 
 @torch.no_grad()
@@ -226,10 +227,12 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
             Y_norm_square = X_norm_square
         else:
             Y_norm_square = torch.sum(Y**2, dim=1, keepdims=True)
+
         # X_square = torch.repeat(X_norm_square, num_Y, dim=1)
         X_square = X_norm_square.expand(-1,num_Y)
         # Y_square = torch.repeat(Y_norm_square.T, num_X, dim=0)
         Y_square = Y_norm_square.T.expand(num_X, -1)
+
         if Y is None:
             Y = X
         XY = torch.matmul(X, Y.T)
