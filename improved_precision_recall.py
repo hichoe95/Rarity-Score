@@ -169,7 +169,7 @@ class IPR():
 
         dataloader = get_custom_loader(path_or_fnames, batch_size=self.batch_size, num_samples=self.num_samples)
         num_found_images = len(dataloader.dataset)
-        desc = 'extracting features of %d images' % num_found_images
+        desc = 'extracting features of %d images' % num_found_images    
         if num_found_images < self.num_samples:
             print('WARNING: num_found_images(%d) < num_samples(%d)' % (num_found_images, self.num_samples))
 
