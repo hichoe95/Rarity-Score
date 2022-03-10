@@ -54,7 +54,7 @@ class CREATIVITY(object):
 		else:
 			real2samples_distances = compute_pairwise_distances(self.modes, samples, metric = self.metric, device = self.device)
 
-		r = self.real2real_sorted[:,k] if not cluster else self.mode2mode_sorted[:, k]
+		r = self.real2real_sorted[:,k] if not cluster else self.mode2mode_sorted[:,k]
 
 		dist_radi = (r[:,None].repeat(samples.shape[0], axis = 1) - real2samples_distances)
 		out_ball_ids = np.where((dist_radi > 0).any(axis = 0) == False)[0]
