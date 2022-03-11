@@ -202,46 +202,6 @@ def cuda_empty(func):
 
 
 
-def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
-    '''
-    args:
-        X: np.array of shape N x dim
-        Y: np.array of shape N x dim
-    returns:
-        N x N symmetric np.array
-    '''
-    num_X = X.shape[0]
-    if Y is None:
-        num_Y = num_X
-    else:
-        num_Y = Y.shape[0]
-    X = X.astype(np.float64)  # to prevent underflow
-    X_norm_square = np.sum(X**2, axis=1, keepdims=True)
-    if Y is None:
-        Y_norm_square = X_norm_square
-    else:
-        Y_norm_square = np.sum(Y**2, axis=1, keepdims=True)
-    X_square = np.repeat(X_norm_square, num_Y, axis=1)
-    Y_square = np.repeat(Y_norm_square.T, num_X, axis=0)
-    if Y is None:
-        Y = X
-    XY = np.dot(X, Y.T)
-    diff_square = X_square - 2*XY + Y_square
-
-    # check negative distance
-    min_diff_square = diff_square.min()
-    if min_diff_square < 0:
-        idx = diff_square < 0
-        diff_square[idx] = 0
-        print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
-              min_diff_square)
-
-    distances = np.sqrt(diff_square)
-    return distances
-
-
-# @torch.no_grad()
-# @cuda_empty
 # def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
 #     '''
 #     args:
@@ -250,59 +210,93 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
 #     returns:
 #         N x N symmetric np.array
 #     '''
-#     X = torch.tensor(X).to(device)
+#     num_X = X.shape[0]
+#     if Y is None:
+#         num_Y = num_X
+#     else:
+#         num_Y = Y.shape[0]
+#     X = X.astype(np.float64)  # to prevent underflow
+#     X_norm_square = np.sum(X**2, axis=1, keepdims=True)
+#     if Y is None:
+#         Y_norm_square = X_norm_square
+#     else:
+#         Y_norm_square = np.sum(Y**2, axis=1, keepdims=True)
+#     X_square = np.repeat(X_norm_square, num_Y, axis=1)
+#     Y_square = np.repeat(Y_norm_square.T, num_X, axis=0)
+#     if Y is None:
+#         Y = X
+#     XY = np.dot(X, Y.T)
+#     diff_square = X_square - 2*XY + Y_square
 
-#     if Y is not None:
-#         Y = torch.tensor(Y).to(device).type(torch.float64)
+#     # check negative distance
+#     min_diff_square = diff_square.min()
+#     if min_diff_square < 0:
+#         idx = diff_square < 0
+#         diff_square[idx] = 0
+#         print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
+#               min_diff_square)
 
-#     if metric == 'euclidian':
-#         num_X = X.shape[0]
-#         if Y is None:
-#             num_Y = num_X
-#         else:
-#             num_Y = Y.shape[0]
-#         X = X.type(torch.float64)  # to prevent underflow
-#         X_norm_square = torch.sum(X**2, dim=1, keepdims=True)
-#         if Y is None:
-#             Y_norm_square = X_norm_square
-#         else:
-#             Y_norm_square = torch.sum(Y**2, dim=1, keepdims=True)
-
-#         torch.cuda.empty_cache()
-#         # X_square = torch.repeat(X_norm_square, num_Y, dim=1)
-#         X_square = X_norm_square.expand(-1,num_Y)
-#         # Y_square = torch.repeat(Y_norm_square.T, num_X, dim=0)
-#         Y_square = Y_norm_square.T.expand(num_X, -1)
-#         torch.cuda.empty_cache()
-
-#         if Y is None:
-#             Y = X
-#         XY = torch.matmul(X, Y.T)
-#         diff_square = X_square - 2*XY + Y_square
-
-#         # check negative distance
-#         min_diff_square = diff_square.min()
-#         torch.cuda.empty_cache()
-#         if min_diff_square < 0:
-#             idx = diff_square < 0
-#             diff_square[idx] = 0
-#             print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
-#                   min_diff_square)
-
-#         distances = torch.sqrt(diff_square).detach().cpu().numpy()
-
-#     elif metric == 'cossim':
-#         X = X.type(torch.float64)
-#         X = (X.T / torch.linalg.norm(X, dim = 1)).T
-
-#         if Y is None:
-#             Y = X.T
-#         else:
-#             Y = Y.T / torch.linalg.norm(Y, dim = 1)
-
-#         distances = (-(1 + X@Y)).detach().cpu().numpy()
-
+#     distances = np.sqrt(diff_square)
 #     return distances
+
+
+@torch.no_grad()
+@cuda_empty
+def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
+
+    X = torch.tensor(X).to(device)
+
+    if Y is not None:
+        Y = torch.tensor(Y).to(device).type(torch.float64)
+
+    if metric == 'euclidian':
+        num_X = X.shape[0]
+        if Y is None:
+            num_Y = num_X
+        else:
+            num_Y = Y.shape[0]
+        X = X.type(torch.float64)  # to prevent underflow
+        X_norm_square = torch.sum(X**2, dim=1, keepdims=True)
+        if Y is None:
+            Y_norm_square = X_norm_square
+        else:
+            Y_norm_square = torch.sum(Y**2, dim=1, keepdims=True)
+
+        torch.cuda.empty_cache()
+        # X_square = torch.repeat(X_norm_square, num_Y, dim=1)
+        X_square = X_norm_square.expand(-1,num_Y)
+        # Y_square = torch.repeat(Y_norm_square.T, num_X, dim=0)
+        Y_square = Y_norm_square.T.expand(num_X, -1)
+        torch.cuda.empty_cache()
+
+        if Y is None:
+            Y = X
+        XY = torch.matmul(X, Y.T)
+        diff_square = X_square - 2*XY + Y_square
+
+        # check negative distance
+        min_diff_square = diff_square.min()
+        torch.cuda.empty_cache()
+        if min_diff_square < 0:
+            idx = diff_square < 0
+            diff_square[idx] = 0
+            print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
+                  min_diff_square)
+
+        distances = torch.sqrt(diff_square).detach().cpu().numpy()
+
+    elif metric == 'cossim':
+        X = X.type(torch.float64)
+        X = (X.T / torch.linalg.norm(X, dim = 1)).T
+
+        if Y is None:
+            Y = X.T
+        else:
+            Y = Y.T / torch.linalg.norm(Y, dim = 1)
+
+        distances = (-(1 + X@Y)).detach().cpu().numpy()
+
+    return distances
 
 def distances2radii(distances, k=3):
     num_features = distances.shape[0]

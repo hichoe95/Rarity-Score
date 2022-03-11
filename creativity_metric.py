@@ -24,6 +24,9 @@ class CREATIVITY(object):
 		self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
 		self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
 
+		
+		torch.cuda.empty_cache()
+
 		# for clustering
 		self.num_cluster = 0
 		self.modes = None
