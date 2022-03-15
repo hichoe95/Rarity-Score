@@ -244,10 +244,10 @@ def cuda_empty(func):
 @cuda_empty
 def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
 
-    X = torch.tensor(X).to(device)
+    X = torch.from_numpy(X).to(device)
 
     if Y is not None:
-        Y = torch.tensor(Y).to(device).type(torch.float64)
+        Y = torch.from_numpy(Y).to(device).type(torch.float64)
 
     if metric == 'euclidian':
         num_X = X.shape[0]
