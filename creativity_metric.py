@@ -7,6 +7,7 @@ from improved_precision_recall import compute_pairwise_distances
 
 
 class CREATIVITY(object):
+	@torch.no_grad()
 	def __init__(self, real_features, fake_features, metric = 'euclidian', device = 'cpu'):
 
 		self.metric = metric
@@ -19,15 +20,15 @@ class CREATIVITY(object):
 		self.num_fakes = fake_features.shape[0]
 
 		print('Pre-processing pairwise diatances ...')
-		
 		self.real2real_distances = compute_pairwise_distances(real_features, metric = self.metric, device = self.device)
 
 		# self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
 		# self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
-		self.real2real_sorted = torch.sort(self.real2real_distances, dim = 1)
-		self.real2real_sorted_ids = self.real2real_distances.argsort(dim = 1)
-		
+		self.real2real_sorted = self.real2real_distances.sort(dim = 1)[0].detach().cpu().numpy()
+		self.real2real_sorted_ids = self.real2real_distances.argsort(dim = 1).detach().cpu().numpy()
+
 		torch.cuda.empty_cache()
+
 
 		# for clustering
 		self.num_cluster = 0
@@ -58,6 +59,7 @@ class CREATIVITY(object):
 			real2samples_distances = compute_pairwise_distances(self.real_features, samples, metric = self.metric, device = self.device)
 		else:
 			real2samples_distances = compute_pairwise_distances(self.modes, samples, metric = self.metric, device = self.device)
+		real2samples_distances = real2samples_distances.detach().cpu().numpy()
 
 		r = self.real2real_sorted[:,k] if not cluster else self.mode2mode_sorted[:,k]
 
@@ -219,6 +221,7 @@ class CREATIVITY(object):
 			self.sample_mode_ids = cluster.labels_
 
 			self.mode2mode_distances = compute_pairwise_distances(self.modes, metric = self.metric, device = self.device)
+			self.mode2mode_distacnes = self.mode2mode_distances.detach().cpu().numpy()
 			self.mode2mode_sorted = np.sort(self.mode2mode_distances, axis = 1)
 			self.mode2mode_sorted_ids = self.mode2mode_distances.argsort(axis = 1)
 			print("Clustering is done!")

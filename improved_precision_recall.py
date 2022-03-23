@@ -283,7 +283,7 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
             print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
                   min_diff_square)
 
-        distances = torch.sqrt(diff_square)
+        distances = torch.sqrt(diff_square).detach().cpu()
 
     elif metric == 'cossim':
         X = X.type(torch.float64)
@@ -294,7 +294,7 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
         else:
             Y = Y.T / torch.linalg.norm(Y, dim = 1)
 
-        distances = (-(1 + X@Y))
+        distances = (-(1 + X@Y)).detach().cpu()
 
     return distances
 
