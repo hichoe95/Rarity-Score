@@ -283,7 +283,7 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
             print('WARNING: %d negative diff_squares found and set to zero, min_diff_square=' % idx.sum(),
                   min_diff_square)
 
-        distances = torch.sqrt(diff_square).detach().cpu().numpy()
+        distances = torch.sqrt(diff_square)
 
     elif metric == 'cossim':
         X = X.type(torch.float64)
@@ -294,7 +294,7 @@ def compute_pairwise_distances(X, Y=None, metric = 'euclidian', device = 'cpu'):
         else:
             Y = Y.T / torch.linalg.norm(Y, dim = 1)
 
-        distances = (-(1 + X@Y)).detach().cpu().numpy()
+        distances = (-(1 + X@Y))
 
     return distances
 
@@ -353,6 +353,8 @@ class ImageFolder(Dataset):
     def __getitem__(self, index):
         image_path = self.fnames[index]
         image = Image.open(image_path).convert('RGB')
+        image = image.resize((224,224), Image.BICUBIC)# for PIL bicubic resize.
+
         if self.transform is not None:
             image = self.transform(image)
         return image
@@ -369,6 +371,8 @@ class FileNames(Dataset):
     def __getitem__(self, index):
         image_path = self.fnames[index]
         image = Image.open(image_path).convert('RGB')
+        image = image.resize((224,224), Image.BICUBIC) # for PIL bicubic resize.
+
         if self.transform is not None:
             image = self.transform(image)
         return image
@@ -379,10 +383,11 @@ class FileNames(Dataset):
 
 def get_custom_loader(image_dir_or_fnames, image_size=224, batch_size=50, num_workers=4, num_samples=-1):
     transform = []
-    transform.append(transforms.Resize([image_size, image_size]))
+    # transform.append(transforms.Resize([image_size, image_size]))
     transform.append(transforms.ToTensor())
     transform.append(transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                           std=[0.229, 0.224, 0.225]))
+
     transform = transforms.Compose(transform)
 
     if isinstance(image_dir_or_fnames, list):

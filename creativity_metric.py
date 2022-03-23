@@ -19,11 +19,13 @@ class CREATIVITY(object):
 		self.num_fakes = fake_features.shape[0]
 
 		print('Pre-processing pairwise diatances ...')
+		
 		self.real2real_distances = compute_pairwise_distances(real_features, metric = self.metric, device = self.device)
 
-		self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
-		self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
-
+		# self.real2real_sorted = np.sort(self.real2real_distances, axis = 1)
+		# self.real2real_sorted_ids = self.real2real_distances.argsort(axis = 1)
+		self.real2real_sorted = torch.sort(self.real2real_distances, dim = 1)
+		self.real2real_sorted_ids = self.real2real_distances.argsort(dim = 1)
 		
 		torch.cuda.empty_cache()
 
