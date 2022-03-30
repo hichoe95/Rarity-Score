@@ -193,12 +193,6 @@ class IPR():
 
 
 
-def cuda_empty(func):
-    def wrapper(*args, **kwargs):
-        ret = func(*args, **kwargs)
-        torch.cuda.empty_cache()
-        return ret
-    return wrapper
 
 
 
@@ -238,6 +232,12 @@ def cuda_empty(func):
 
 #     distances = np.sqrt(diff_square)
 #     return distances
+def cuda_empty(func):
+    def wrapper(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        torch.cuda.empty_cache()
+        return ret
+    return wrapper
 
 
 @torch.no_grad()
