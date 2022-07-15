@@ -1,5 +1,27 @@
 # GAN_Creativity
 
+### Example
+```python
+from rarity_score import *
+import numpy as np
+
+feature_dim = 2048
+num_samples = 100
+nearest_k = 3
+
+real_features = np.random.normal(size=(100, 2048))
+fake_features = np.random.normal(size=(100, 2048))
+
+
+manifold = MANIFOLD(real_features=real_features, fake_features=fake_features)
+
+score, score_index = manifold.rarity(k=nearest_k)
+
+print(score[score_index])
+```
+
+
+
 ### License
 ```
 Copyright 2022-present NAVER Corp.
