@@ -9,8 +9,8 @@ feature_dim = 2048
 num_samples = 100
 nearest_k = 3
 
-real_features = np.random.normal(size=(100, 2048))
-fake_features = np.random.normal(size=(100, 2048))
+real_features = np.random.normal(size=(num_samples, feature_dim))
+fake_features = np.random.normal(size=(num_samples, feature_dim))
 
 
 manifold = MANIFOLD(real_features=real_features, fake_features=fake_features)
