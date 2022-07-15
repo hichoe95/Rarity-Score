@@ -1,4 +1,15 @@
-# GAN_Creativity
+# Rarity Score
+
+[Paper: Rarity Score : A New Metric to Evaluate the Uncommonness of Synthesized Images](https://arxiv.org/abs/2206.08549)
+
+Jiyeon Han<sup>1</sup>, Hwanil Choi<sup>1</sup>, Yunjey Choi<sup>2</sup>, 
+Junho Kim<sup>2</sup>, Jungwoo Ha<sup>2</sup>, Jaesik Choi<sup>1</sup>    
+
+
+<sup>1</sup> <sub>Graduate School of AI, KAIST</sub>
+<sup>2</sup> <sub>AI Lab, NAVER Corp.</sub>
+
+Evaluation metrics in image synthesis play a key role to measure performances of generative models. However, most metrics mainly focus on image fidelity. Existing diversity metrics are derived by comparing distributions, and thus they cannot quantify the diversity or rarity degree of each generated image. In this work, we propose a new evaluation metric, called `rarity score', to measure the individual rarity of each image synthesized by generative models. We first show empirical observation that common samples are close to each other and rare samples are far from each other in nearest-neighbor distances of feature space. We then use our metric to demonstrate that the extent to which different generative models produce rare images can be effectively compared. We also propose a method to compare rarities between datasets that share the same concept such as CelebA-HQ and FFHQ. Finally, we analyze the use of metrics in different designs of feature spaces to better understand the relationship between feature spaces and resulting sparse images. Code will be publicly available online for the research community.
 
 ### Example
 ```python
