@@ -30,11 +30,13 @@ where <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&spa
 ### Histograms of rarity score
 The histogram of rarity score can be used to compare between the models or the datasets. 
 For example, the histogram moves to the left as the truncation parameter gets smaller (the generations get similar to the average generation). 
-Or, for the different datasets with the same concept, such as FFHQ and CelebA-HQ, the more diverse the dataset is, the higher the rarity scores are and the histogram moves to the right. 
 
 <p align="center">
     <img src=truncation_histogram.png width="900"> 
 </p>
+
+Or, for the different datasets with the same concept, such as FFHQ and CelebA-HQ, the more diverse the dataset is, the higher the rarity scores are and the histogram moves to the right. 
+
 <p align="center">
     <img src=dataset_histogram.png width="900"> 
 </p>
