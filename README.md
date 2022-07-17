@@ -20,12 +20,15 @@ Evaluation metrics in image synthesis play a key role to measure performances of
 <p align="center">
     <img src=rarity_score.png width="900"> 
 </p>
+We hypothesize that ordinary samples would be closer to each other whereas unique and rare samples would be sparsely located in the feature space. 
 
-For the fake feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_g\in\mathbf{\Phi_g}" title="\inline \phi_g\in\mathbf{\Phi_g}" /> and the real feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_r\in\mathbf{\Phi_r}" title="\inline \phi_r\in\mathbf{\Phi_r}" />, our rarity score is defined as below
+For the fake feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_g\in\mathbf{\Phi_g}" title="\inline \phi_g\in\mathbf{\Phi_g}" />and the real feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_r\in\mathbf{\Phi_r}" title="\inline \phi_r\in\mathbf{\Phi_r}" />,our rarity score is defined as below
 
 <img src="https://latex.codecogs.com/png.image?\dpi{150}&space;\text{Rarity}(\phi_g,\mathbf{\Phi_r})&space;=&space;\min_{r,&space;s.t.&space;\phi_g\in&space;B_k(\phi_r,\mathbf{\Phi_r})&space;}NN_k(\phi_r,\mathbf{\Phi_r})" title="\text{Rarity}(\phi_g,\mathbf{\Phi_r}) = \min_{r, s.t. \phi_g\in B_k(\phi_r,\mathbf{\Phi_r}) }NN_k(\phi_r,\mathbf{\Phi_r})" />
 
 where <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;B_k(\phi_i,\mathbf{\Phi})" title="\inline B_k(\phi_i,\mathbf{\Phi})" /> is the k-NN sphere of <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_i" title="\inline \phi_i" /> with the radius of <img src="https://latex.codecogs.com/png.image?\dpi{100}&space;\inline&space;$NN_k(\phi_i,\mathbf{\Phi})$" title="\inline $NN_k(\phi_i,\mathbf{\Phi})$" />.
+
+The proposed rarity score defines the rarity of an individual fake sample as the radius of k-NN sphere of a real sample which contains the given fake sample. By taking the minimum of the radii, we can prevent overestimating the sparsity of the given fake sample. As the fidelity of the samples outside of the real manifold is not guaranteed, our metric discards the generations which is not contained in the real manifold.
 
 ### Histograms of rarity score
 The histogram of rarity score can be used to compare between the models or the datasets. 
