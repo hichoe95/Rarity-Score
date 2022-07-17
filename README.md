@@ -24,8 +24,6 @@ We hypothesize that ordinary samples would be closer to each other whereas uniqu
 
 For the fake feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_g\in\mathbf{\Phi_g}" title="\inline \phi_g\in\mathbf{\Phi_g}" />and the real feature <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_r\in\mathbf{\Phi_r}" title="\inline \phi_r\in\mathbf{\Phi_r}" />,our rarity score is defined as below
 
-$$ Rarity(\phi_g,\mathbf{\Phi_r}) = \min_{r, s.t. \phi_g\in B_k(\phi_r,\mathbf{\Phi_r}) }NN_k(\phi_r,\mathbf{\Phi_r}). $$
-
 <img src="https://latex.codecogs.com/png.image?\dpi{150}&space;\text{Rarity}(\phi_g,\mathbf{\Phi_r})&space;=&space;\min_{r,&space;s.t.&space;\phi_g\in&space;B_k(\phi_r,\mathbf{\Phi_r})&space;}NN_k(\phi_r,\mathbf{\Phi_r})" title="\text{Rarity}(\phi_g,\mathbf{\Phi_r}) = \min_{r, s.t. \phi_g\in B_k(\phi_r,\mathbf{\Phi_r}) }NN_k(\phi_r,\mathbf{\Phi_r})" />
 
 where <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;B_k(\phi_i,\mathbf{\Phi})" title="\inline B_k(\phi_i,\mathbf{\Phi})" /> is the k-NN sphere of <img src="https://latex.codecogs.com/png.image?\dpi{110}&space;\inline&space;\phi_i" title="\inline \phi_i" /> with the radius of <img src="https://latex.codecogs.com/png.image?\dpi{100}&space;\inline&space;$NN_k(\phi_i,\mathbf{\Phi})$" title="\inline $NN_k(\phi_i,\mathbf{\Phi})$" />.
