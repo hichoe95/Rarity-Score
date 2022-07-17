@@ -3,7 +3,7 @@
 [Paper: Rarity Score : A New Metric to Evaluate the Uncommonness of Synthesized Images](https://arxiv.org/abs/2206.08549)
 
 Jiyeon Han<sup>1</sup>, Hwanil Choi<sup>1</sup>, Yunjey Choi<sup>2</sup>, 
-Junho Kim<sup>2</sup>, Jungwoo Ha<sup>2</sup>, Jaesik Choi<sup>1</sup>    
+Junho Kim<sup>2</sup>, Jung-Woo Ha<sup>2</sup>, Jaesik Choi<sup>1</sup>    
 
 
 <sup>1</sup> <sub>Graduate School of AI, KAIST</sub>
